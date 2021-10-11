@@ -1,0 +1,16 @@
+<svg width="363" height="522" viewBox="0 0 363 522" fill="none"
+  xmlns="http://www.w3.org/2000/svg">
+  <rect x="43" width="277" height="39" fill="black"/>
+  <rect x="49.5" y="271.5" width="262" height="42" stroke="black" stroke-width="5"/>
+  <line x1="98.7082" y1="269" x2="98.7082" y2="316" stroke="black" stroke-width="5"/>
+  <line x1="208.06" y1="269" x2="208.06" y2="316" stroke="black" stroke-width="5"/>
+  <line x1="262.735" y1="269" x2="262.736" y2="316" stroke="black" stroke-width="5"/>
+  <line x1="153.384" y1="269" x2="153.384" y2="316" stroke="black" stroke-width="5"/>
+  <line x1="183" y1="8" x2="183" y2="522" stroke="black" stroke-width="10"/>
+  <path d="M46 37.5C56.8759 112.853 79.6691 271.876 180.38 306.201" stroke="black" stroke-width="3"/>
+  <path d="M76.8691 34C87.745 109.353 102.5 259 180 304" stroke="black" stroke-width="3"/>
+  <path d="M124.128 37C135.004 112.353 122 241.5 179.5 301.5" stroke="black" stroke-width="3"/>
+  <path d="M316.692 37.5C305.816 112.853 283.023 271.876 182.312 306.201" stroke="black" stroke-width="3"/>
+  <path d="M285.823 34C274.947 109.353 260.192 259 182.692 304" stroke="black" stroke-width="3"/>
+  <path d="M238.564 37C227.688 112.353 240.692 241.5 183.192 301.5" stroke="black" stroke-width="3"/>
+</svg>
