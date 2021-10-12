@@ -105,6 +105,7 @@ app.post("/createuser", function (req, res) { return __awaiter(void 0, void 0, v
                             code: 1,
                         }))];
                 }
+                console.log(e_1);
                 return [2 /*return*/, res.send(JSON.stringify({
                         success: false,
                         code: 2,

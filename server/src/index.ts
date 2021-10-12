@@ -70,6 +70,7 @@ app.post("/createuser", async (req: express.Request, res: express.Response) => {
         })
       );
     }
+    console.log(e);
     return res.send(
       JSON.stringify({
         success: false,
