@@ -43,9 +43,15 @@ var express_1 = __importDefault(require("express"));
 var dotenv_1 = __importDefault(require("dotenv"));
 var pg_1 = require("pg");
 var bcrypt_1 = __importDefault(require("bcrypt"));
+var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+var cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 var app = express_1.default();
 app.use(express_1.default.json());
+app.use(cors_1.default({
+    origin: "http://localhost",
+    credentials: true,
+}));
 var PORT = 5000;
 var pool = new pg_1.Pool({
     user: process.env.PGUSER,
@@ -72,7 +78,7 @@ app.get("/", function (req, res) {
     value 2 --> Unhandled server error
 */
 app.post("/createuser", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var hash, con, result, e_1;
+    var hash, con, result, token, e_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -83,16 +89,14 @@ app.post("/createuser", function (req, res) { return __awaiter(void 0, void 0, v
                 return [4 /*yield*/, pool.connect()];
             case 2:
                 con = _a.sent();
-                return [4 /*yield*/, con.query("INSERT INTO users(first_name,last_name, email,password) VALUES ($1,$2,$3,$4)", [
-                        req.body.first_name,
-                        req.body.last_name,
-                        req.body.email,
-                        hash,
-                    ])];
+                return [4 /*yield*/, con.query("INSERT INTO users(first_name,last_name, email,password) VALUES ($1,$2,$3,$4) RETURNING id", [req.body.first_name, req.body.last_name, req.body.email, hash])];
             case 3:
                 result = _a.sent();
-                res.send(JSON.stringify({ success: true }));
-                return [3 /*break*/, 5];
+                token = jsonwebtoken_1.default.sign({ id: result.rows[0].id }, process.env.JWTSECRET, {
+                    expiresIn: "1h",
+                });
+                res.setHeader("Set-Cookie", "token: " + token + "; HttpOnly; Secure;");
+                return [2 /*return*/, res.send(JSON.stringify({ success: true }))];
             case 4:
                 e_1 = _a.sent();
                 if (e_1.code === "23505") {
@@ -103,7 +107,7 @@ app.post("/createuser", function (req, res) { return __awaiter(void 0, void 0, v
                 }
                 return [2 /*return*/, res.send(JSON.stringify({
                         success: false,
-                        code: 2
+                        code: 2,
                     }))];
             case 5: return [2 /*return*/];
         }

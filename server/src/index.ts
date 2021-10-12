@@ -1,14 +1,21 @@
 import express from "express";
 import dotenv from "dotenv";
 import { Pool } from "pg";
-import bcrypt from "bcrypt";
+import bcrypt, { compareSync } from "bcrypt";
+import jwt from "jsonwebtoken";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
-
+app.use(
+  cors({
+    origin: "http://localhost",
+    credentials: true,
+  })
+);
 const PORT = 5000;
 
 const pool = new Pool({
@@ -46,15 +53,14 @@ app.post("/createuser", async (req: express.Request, res: express.Response) => {
 
     const con = await pool.connect();
     const result = await con.query(
-      `INSERT INTO users(first_name,last_name, email,password) VALUES ($1,$2,$3,$4)`,
-      [
-        req.body.first_name,
-        req.body.last_name,
-        req.body.email,
-        hash,
-      ]
+      `INSERT INTO users(first_name,last_name, email,password) VALUES ($1,$2,$3,$4) RETURNING id`,
+      [req.body.first_name, req.body.last_name, req.body.email, hash]
     );
-    res.send(JSON.stringify({ success: true }));
+    const token = jwt.sign({ id: result.rows[0].id }, process.env.JWTSECRET!, {
+      expiresIn: "1h",
+    });
+    res.setHeader("Set-Cookie", `token: ${token}; HttpOnly; Secure;`);
+    return res.send(JSON.stringify({ success: true }));
   } catch (e) {
     if (e.code === "23505") {
       return res.send(
@@ -67,7 +73,7 @@ app.post("/createuser", async (req: express.Request, res: express.Response) => {
     return res.send(
       JSON.stringify({
         success: false,
-        code: 2
+        code: 2,
       })
     );
   }
