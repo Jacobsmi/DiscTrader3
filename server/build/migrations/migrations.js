@@ -58,7 +58,7 @@ var pool = new pg_1.Pool({
                 return [4 /*yield*/, pool.connect()];
             case 1:
                 connection = _a.sent();
-                return [4 /*yield*/, connection.query("\n      CREATE TABLE IF NOT EXISTS users(\n        id SERIAL,\n        first_name TEXT NOT NULL,\n        last_name TEXT NOT NULL,\n        email TEXT UNIQUE NOT NULL,\n        password TEXT NOT NULL\n      )\n    ")];
+                return [4 /*yield*/, connection.query("\n      CREATE TABLE IF NOT EXISTS users(\n        id SERIAL,\n        first_name VARCHAR NOT NULL,\n        last_name VARCHAR NOT NULL,\n        email VARCHAR UNIQUE NOT NULL,\n        password VARCHAR NOT NULL\n      )\n    ")];
             case 2:
                 _a.sent();
                 return [4 /*yield*/, connection.release()];

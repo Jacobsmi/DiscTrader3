@@ -17,10 +17,10 @@ const pool = new Pool({
     await connection.query(`
       CREATE TABLE IF NOT EXISTS users(
         id SERIAL,
-        first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
+        first_name VARCHAR NOT NULL,
+        last_name VARCHAR NOT NULL,
+        email VARCHAR UNIQUE NOT NULL,
+        password VARCHAR NOT NULL
       )
     `)
     await connection.release()

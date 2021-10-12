@@ -14,4 +14,5 @@
   PGPASSWORD=PASSWORD
   PGPORT=5432
   ```
+- While in the server directory run `node ./build/migrations/migrations.js` to create the necessary tables in the database
 - 
