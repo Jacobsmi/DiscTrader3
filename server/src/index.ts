@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
@@ -59,7 +59,7 @@ app.post("/createuser", async (req: express.Request, res: express.Response) => {
     const token = jwt.sign({ id: result.rows[0].id }, process.env.JWTSECRET!, {
       expiresIn: "1h",
     });
-    res.setHeader("Set-Cookie", `token: ${token}; HttpOnly; Secure;`);
+    res.setHeader("Set-Cookie", `token=${token}; HttpOnly; Secure;`);
     return res.send(JSON.stringify({ success: true }));
   } catch (e) {
     if (e.code === "23505") {

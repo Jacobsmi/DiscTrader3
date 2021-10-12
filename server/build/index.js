@@ -49,7 +49,7 @@ dotenv_1.default.config();
 var app = express_1.default();
 app.use(express_1.default.json());
 app.use(cors_1.default({
-    origin: "http://localhost",
+    origin: "http://localhost:3000",
     credentials: true,
 }));
 var PORT = 5000;
@@ -95,7 +95,7 @@ app.post("/createuser", function (req, res) { return __awaiter(void 0, void 0, v
                 token = jsonwebtoken_1.default.sign({ id: result.rows[0].id }, process.env.JWTSECRET, {
                     expiresIn: "1h",
                 });
-                res.setHeader("Set-Cookie", "token: " + token + "; HttpOnly; Secure;");
+                res.setHeader("Set-Cookie", "token=" + token + "; HttpOnly; Secure;");
                 return [2 /*return*/, res.send(JSON.stringify({ success: true }))];
             case 4:
                 e_1 = _a.sent();

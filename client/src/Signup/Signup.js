@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 
-export default function Signup(){
+export default function Signup() {
   const [validFirstName, setValidFirstName] = useState(true);
   const [validLastName, setValidLastName] = useState(true);
   const [validEmail, setValidEmail] = useState(true);
@@ -12,7 +12,7 @@ export default function Signup(){
   const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()])[0-9a-zA-Z!@#$%^&*()]{8,}$/;
 
-  const handleClick = () =>{
+  const handleClick = async () => {
     const firstName = document.getElementById("Signup-FirstName").value;
     const lastName = document.getElementById("Signup-LastName").value;
     const email = document.getElementById("Signup-Email").value;
@@ -25,12 +25,26 @@ export default function Signup(){
     setValidPassword(passwordRegex.test(password));
     setValidConfirm(passwordRegex.test(confirm) && confirm === password);
 
-    if(nameRegex.test(firstName) && nameRegex.test(lastName) && emailRegex.test(email) && passwordRegex.test(password) && confirm === password){
-      console.log("Ready for API call");
+    if (nameRegex.test(firstName) && nameRegex.test(lastName) && emailRegex.test(email) && passwordRegex.test(password) && confirm === password) {
+      const res = await fetch("http://localhost:5000/createuser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          password: password
+        })
+      })
+      const resJSON = await res.json()
+      console.log(resJSON);
     }
   }
 
-  return(
+  return (
     <Box
       sx={{
         height: "100vh",
@@ -42,7 +56,7 @@ export default function Signup(){
         bgcolor: "primary.main"
       }}
     >
-      <Box 
+      <Box
         sx={{
           height: "70%",
           width: ["80%", "70%", "40%", "35%", "30%"],
@@ -50,25 +64,25 @@ export default function Signup(){
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "space-evenly", 
-          bgcolor:"white"
+          justifyContent: "space-evenly",
+          bgcolor: "white"
         }}
       >
         <Typography variant="h5">Sign Up</Typography>
-        
-        
+
+
         <Box
           sx={{
             width: "80%",
             boxSizing: "border-box",
           }}
         >
-          <TextField variant="outlined" error={!validFirstName} id="Signup-FirstName" label="First Name" size="small" sx={{ marginRight: "10%", width: "45%"}}></TextField>
-          <TextField variant="outlined" error={!validLastName} id="Signup-LastName" label="Last Name" size="small" sx={{width: "45%"}}></TextField>
+          <TextField variant="outlined" error={!validFirstName} id="Signup-FirstName" label="First Name" size="small" sx={{ marginRight: "10%", width: "45%" }}></TextField>
+          <TextField variant="outlined" error={!validLastName} id="Signup-LastName" label="Last Name" size="small" sx={{ width: "45%" }}></TextField>
         </Box>
-        <TextField variant="outlined" error={!validEmail} id="Signup-Email" label="E-Mail" type="email" size="small" sx={{width: "80%"}}></TextField>
-        <TextField variant="outlined" error={!validPassword} id="Signup-Password" label="Password" type="password" size="small" sx={{width: "80%"}}></TextField>
-        <TextField variant="outlined" error={!validConfirm} id="Signup-Confirm" label="Confirm Password" type="password" size="small" sx={{width: "80%"}}></TextField>
+        <TextField variant="outlined" error={!validEmail} id="Signup-Email" label="E-Mail" type="email" size="small" sx={{ width: "80%" }}></TextField>
+        <TextField variant="outlined" error={!validPassword} id="Signup-Password" label="Password" type="password" size="small" sx={{ width: "80%" }}></TextField>
+        <TextField variant="outlined" error={!validConfirm} id="Signup-Confirm" label="Confirm Password" type="password" size="small" sx={{ width: "80%" }}></TextField>
         <Button variant="contained" onClick={handleClick}>Sign Up</Button>
 
       </Box>

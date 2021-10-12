@@ -15,4 +15,4 @@
   PGPORT=5432
   ```
 - While in the server directory run `node ./build/migrations/migrations.js` to create the necessary tables in the database
-- 
+- Note: If you are not running the react server on port 3000 you need to change the origin for the CORS options
