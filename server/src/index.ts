@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { Pool } from "pg";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 
@@ -26,9 +27,23 @@ app.get("/", (req: express.Request, res: express.Response) => {
   );
 });
 
+/*
+  Takes in a post request and get arguments from the body then, attempts to 
+  hash password and store user.
+  If successful simple success message is sent and JWT is generated with encrypted id
+  If not successful an error code is sent representing the failure
+
+  response:
+  @param success boolean
+  @param code int
+    value 1 --> duplicate error (email is duplicate)
+    value 2 --> Unhandled server error
+*/
 app.post("/createuser", async (req: express.Request, res: express.Response) => {
   // Attempt to insert the user into the database
   try {
+    const hash = await bcrypt.hash(req.body.password, 10);
+
     const con = await pool.connect();
     const result = await con.query(
       `INSERT INTO users(first_name,last_name, email,password) VALUES ($1,$2,$3,$4)`,
@@ -36,16 +51,23 @@ app.post("/createuser", async (req: express.Request, res: express.Response) => {
         req.body.first_name,
         req.body.last_name,
         req.body.email,
-        req.body.password,
+        hash,
       ]
     );
     res.send(JSON.stringify({ success: true }));
   } catch (e) {
-    console.log(e);
+    if (e.code === "23505") {
+      return res.send(
+        JSON.stringify({
+          success: false,
+          code: 1,
+        })
+      );
+    }
     return res.send(
       JSON.stringify({
         success: false,
-        err: "server_error",
+        code: 2
       })
     );
   }

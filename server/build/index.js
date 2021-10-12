@@ -42,6 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var dotenv_1 = __importDefault(require("dotenv"));
 var pg_1 = require("pg");
+var bcrypt_1 = __importDefault(require("bcrypt"));
 dotenv_1.default.config();
 var app = express_1.default();
 app.use(express_1.default.json());
@@ -58,33 +59,53 @@ app.get("/", function (req, res) {
         success: true,
     }));
 });
+/*
+  Takes in a post request and get arguments from the body then, attempts to
+  hash password and store user.
+  If successful simple success message is sent and JWT is generated with encrypted id
+  If not successful an error code is sent representing the failure
+
+  response:
+  @param success boolean
+  @param code int
+    value 1 --> duplicate error (email is duplicate)
+    value 2 --> Unhandled server error
+*/
 app.post("/createuser", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var con, result, e_1;
+    var hash, con, result, e_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 3, , 4]);
-                return [4 /*yield*/, pool.connect()];
+                _a.trys.push([0, 4, , 5]);
+                return [4 /*yield*/, bcrypt_1.default.hash(req.body.password, 10)];
             case 1:
+                hash = _a.sent();
+                return [4 /*yield*/, pool.connect()];
+            case 2:
                 con = _a.sent();
                 return [4 /*yield*/, con.query("INSERT INTO users(first_name,last_name, email,password) VALUES ($1,$2,$3,$4)", [
                         req.body.first_name,
                         req.body.last_name,
                         req.body.email,
-                        req.body.password,
+                        hash,
                     ])];
-            case 2:
+            case 3:
                 result = _a.sent();
                 res.send(JSON.stringify({ success: true }));
-                return [3 /*break*/, 4];
-            case 3:
+                return [3 /*break*/, 5];
+            case 4:
                 e_1 = _a.sent();
-                console.log(e_1);
+                if (e_1.code === "23505") {
+                    return [2 /*return*/, res.send(JSON.stringify({
+                            success: false,
+                            code: 1,
+                        }))];
+                }
                 return [2 /*return*/, res.send(JSON.stringify({
                         success: false,
-                        err: "server_error",
+                        code: 2
                     }))];
-            case 4: return [2 /*return*/];
+            case 5: return [2 /*return*/];
         }
     });
 }); });
