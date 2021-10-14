@@ -1,5 +1,6 @@
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import Landing from "./Landing/Landing";
+import Login from "./Login/Login";
 import Signup from "./Signup/Signup";
 
 export default function App() {
@@ -7,6 +8,9 @@ export default function App() {
     <div className="App">
       <BrowserRouter>
         <Switch>
+          <Route path="/login">
+            <Login />
+          </Route>
           <Route path="/signup">
             <Signup />
           </Route>

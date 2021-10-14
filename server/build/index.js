@@ -92,6 +92,7 @@ app.post("/createuser", function (req, res) { return __awaiter(void 0, void 0, v
                 return [4 /*yield*/, con.query("INSERT INTO users(first_name,last_name, email,password) VALUES ($1,$2,$3,$4) RETURNING id", [req.body.first_name, req.body.last_name, req.body.email, hash])];
             case 3:
                 result = _a.sent();
+                con.release();
                 token = jsonwebtoken_1.default.sign({ id: result.rows[0].id }, process.env.JWTSECRET, {
                     expiresIn: "1h",
                 });
@@ -106,6 +107,57 @@ app.post("/createuser", function (req, res) { return __awaiter(void 0, void 0, v
                         }))];
                 }
                 console.log(e_1);
+                return [2 /*return*/, res.send(JSON.stringify({
+                        success: false,
+                        code: 2,
+                    }))];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); });
+app.post("/login", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var con, result, correctPass, token, e_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 4, , 5]);
+                return [4 /*yield*/, pool.connect()];
+            case 1:
+                con = _a.sent();
+                return [4 /*yield*/, con.query("SELECT id, email, password FROM users WHERE email=$1", [req.body.email])];
+            case 2:
+                result = _a.sent();
+                // If rows[0] is undefined that means no user was found so return that response
+                if (result.rows[0] === undefined) {
+                    return [2 /*return*/, res.send(JSON.stringify({
+                            success: false,
+                            code: 1,
+                        }))];
+                }
+                return [4 /*yield*/, bcrypt_1.default.compare(req.body.password, result.rows[0].password)];
+            case 3:
+                correctPass = _a.sent();
+                // If the password is correct log the user in
+                if (correctPass) {
+                    token = jsonwebtoken_1.default.sign({ id: result.rows[0].id }, process.env.JWTSECRET, {
+                        expiresIn: "1h",
+                    });
+                    // Set their JWT with a header
+                    res.setHeader("Set-Cookie", "token=" + token + "; HttpOnly; Secure;");
+                    return [2 /*return*/, res.send(JSON.stringify({
+                            success: true,
+                        }))];
+                }
+                else {
+                    return [2 /*return*/, res.send(JSON.stringify({
+                            success: false,
+                            code: 3,
+                        }))];
+                }
+                return [3 /*break*/, 5];
+            case 4:
+                e_2 = _a.sent();
+                console.log(e_2);
                 return [2 /*return*/, res.send(JSON.stringify({
                         success: false,
                         code: 2,
