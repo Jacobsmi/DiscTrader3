@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { Pool } from "pg";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import cors from "cors";
 
 dotenv.config();
@@ -136,6 +136,55 @@ app.post("/login", async (req: Request, res: Response) => {
         code: 2,
       })
     );
+  }
+});
+
+app.get("/validatetoken", (req: Request, res: Response) => {
+  const cookies = req.headers.cookie?.split(";");
+  const cookieMap = new Map();
+  cookies?.forEach((cookie) => {
+    const vals = cookie.split("=");
+    cookieMap.set(vals[0], vals[1]);
+  });
+  if (cookieMap.get("token") === undefined) {
+    return res.send(
+      JSON.stringify({
+        success: false,
+        msg: "no_jwt",
+      })
+    );
+  } else {
+    try {
+      // Validate the cookie
+      const tokenRes = jwt.verify(
+        cookieMap.get("token"),
+        process.env.JWTSECRET!
+      ) as JwtPayload;
+      
+      if (Date.now() >= tokenRes.exp!) {
+        return res.send(
+          JSON.stringify({
+            success: true,
+          })
+        );
+      } else {
+        return res.send(
+          JSON.stringify({
+            success: false,
+            msg: "jwt_invalid_time",
+          })
+        );
+      }
+    } catch (e) {
+      // Catches if there is some issue in the parsing of the JWT
+      console.log(e);
+      return res.send(
+        JSON.stringify({
+          success: false,
+          msg: "jwt_parse_err",
+        })
+      );
+    }
   }
 });
 

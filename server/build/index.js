@@ -166,6 +166,46 @@ app.post("/login", function (req, res) { return __awaiter(void 0, void 0, void 0
         }
     });
 }); });
+app.get("/validatetoken", function (req, res) {
+    var _a;
+    var cookies = (_a = req.headers.cookie) === null || _a === void 0 ? void 0 : _a.split(";");
+    var cookieMap = new Map();
+    cookies === null || cookies === void 0 ? void 0 : cookies.forEach(function (cookie) {
+        var vals = cookie.split("=");
+        cookieMap.set(vals[0], vals[1]);
+    });
+    if (cookieMap.get("token") === undefined) {
+        return res.send(JSON.stringify({
+            success: false,
+            msg: "no_jwt",
+        }));
+    }
+    else {
+        try {
+            // Validate the cookie
+            var tokenRes = jsonwebtoken_1.default.verify(cookieMap.get("token"), process.env.JWTSECRET);
+            if (Date.now() >= tokenRes.exp) {
+                return res.send(JSON.stringify({
+                    success: true,
+                }));
+            }
+            else {
+                return res.send(JSON.stringify({
+                    success: false,
+                    msg: "jwt_invalid_time",
+                }));
+            }
+        }
+        catch (e) {
+            // Catches if there is some issue in the parsing of the JWT
+            console.log(e);
+            return res.send(JSON.stringify({
+                success: false,
+                msg: "jwt_parse_err",
+            }));
+        }
+    }
+});
 app.listen(PORT, function () {
     console.log("Listening at http://localhost:" + PORT);
 });
